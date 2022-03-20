@@ -14,6 +14,7 @@ COMMON_PREFIXES = {
         'sakaci': 'saka-ci',
         'sapipa': 'sa-pi-pa',
         'mapa': 'ma-pa',
+        'masa': 'ma-sa',
         'miki': 'mi-ki',
         'misa': 'mi-sa',
         'saka': 'sa-ka',
@@ -91,7 +92,7 @@ def tokenize(word):
             frame['suffix'] = suffix
             frame['tokens'] = dashes(phoneme_decode(dup), stem, suffix)
             return frame
-    # pa-CVCV-CVCVC-an, e.g., pa-tera-tera'-han (疑為 pateraterahan)
+    # pa-CVCV-CVCVC-an, e.g., pa-tera-tera'-han (疑為 pateraterahan), masa-hefo-hefong
     # mi-CVCV-CVCV-an, e.g., misa-moli-moli-an
     if len(s) >= 4:
         dup = s[:4]
@@ -140,7 +141,7 @@ def evaluate():
         tok = tokenize(k)
         if k == tok['stem']:
             continue
-        print(f'{v[1]}\t{k:30}{Fore.YELLOW}{tok["prefix"]}{Fore.GREEN} {tok["stem"]}{Fore.LIGHTBLUE_EX} {tok["suffix"]}{Style.RESET_ALL}\t{tok["dup"]}')
+        print(f'{v[1]}\t{k:30}{Fore.YELLOW}{tok["prefix"]}{Fore.GREEN} {tok["stem"]}{Fore.LIGHTBLUE_EX} {tok["suffix"]}{Style.RESET_ALL}\t{tok["type"]}\t{tok["tokens"]}')
 
 def example():
     lexicon = json.load(open("../amis-moedict/docs/s/'a'adingalen.json"))

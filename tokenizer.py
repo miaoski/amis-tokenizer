@@ -9,16 +9,18 @@ import pickle
 import json
 
 COMMON_PREFIXES = {
-        'mapaka': 'ma-pa-ka',
-        'mipaka': 'mi-pa-ka',
+        'mapapipa': 'mapa-pipa',
+        'mapaka': 'ma-paka',
+        'mipaka': 'mi-paka',
         'sakaci': 'saka-ci',
-        'sapipa': 'sa-pi-pa',
-        'mapa': 'ma-pa',
-        'masa': 'ma-sa',
-        'miki': 'mi-ki',
-        'misa': 'mi-sa',
-        'saka': 'sa-ka',
-        'sapi': 'sa-pi',
+        'sapipa': 'sapi-pa',
+        'mapa': 'mapa',
+        'masa': 'masa',
+        'miki': 'miki',
+        'misa': 'misa',
+        'saka': 'saka',
+        'sapi': 'sapi',
+        'paka': 'paka',
         'ka': 'ka',
         'ma': 'ma',
         'mi': 'mi',
@@ -53,7 +55,7 @@ def tokenize(word):
     """
     import re
     stem = stem_tags[word][0]
-    frame = {'word': word, 'stem': '', 'prefix': '', 'suffix': '', 'type': None, 'tokens': word}
+    frame = {'word': word, 'stem': '', 'prefix': '', 'suffix': '', 'type': None, 'tokens': word, 'dup': ''}
     if stem is None:
         return frame
 
@@ -70,7 +72,7 @@ def tokenize(word):
                 frame['tokens'] = dashes(pre, mid, mid+suf, suffix)
                 return frame
         else:
-            return default
+            return frame
     prefix = word[:p]
     suffix = word[p + len(stem):]
 
@@ -88,7 +90,8 @@ def tokenize(word):
     dup = s[0] + 'a'
     if len(p) == 2 and w.startswith(dup + s):
             frame['type'] = 'Ca-CV'
-            frame['prefix'] = phoneme_decode(dup)
+            frame['prefix'] = ''
+            frame['dup']    = phoneme_decode(dup)
             frame['suffix'] = suffix
             frame['tokens'] = dashes(phoneme_decode(dup), stem, suffix)
             return frame
@@ -100,6 +103,7 @@ def tokenize(word):
             frame['type'] = 'CVCVC'
             real_prefix = phoneme_decode(p[:-len(dup)])
             frame['prefix'] = COMMON_PREFIXES.get(real_prefix, real_prefix)
+            frame['dup']    = phoneme_decode(dup)
             frame['suffix'] = suffix
             frame['tokens'] = dashes(frame['prefix'], phoneme_decode(dup), stem, suffix)
             return frame
@@ -109,6 +113,7 @@ def tokenize(word):
             frame['type'] = 'CaCVCVC'
             real_prefix = phoneme_decode(p[:-len(dup)])
             frame['prefix'] = COMMON_PREFIXES.get(real_prefix, real_prefix)
+            frame['dup']    = phoneme_decode(dup)
             frame['suffix'] = suffix
             frame['tokens'] = dashes(frame['prefix'], stem, suffix)
             return frame
@@ -135,13 +140,16 @@ def reparse_all_moedict():
     from glob import glob
     fnx = glob('../amis-moedict/docs/s/*.json')
 
-def evaluate():
+def evaluate(fm, to):
     from colorama import Fore, Style
-    for k, v in stem_tags.items():
+    for k in list(stem_tags.keys())[fm:to]:
+        v = stem_tags[k]
+        if v[0] is None:
+            continue
         tok = tokenize(k)
         if k == tok['stem']:
-            continue
-        print(f'{v[1]}\t{k:30}{Fore.YELLOW}{tok["prefix"]}{Fore.GREEN} {tok["stem"]}{Fore.LIGHTBLUE_EX} {tok["suffix"]}{Style.RESET_ALL}\t{tok["type"]}\t{tok["tokens"]}')
+            assert 0, 'word == stem'
+        print(f'{v[1]}\t{k:30}{Fore.YELLOW}{tok["prefix"]} {Fore.RED}{tok["dup"]} {Fore.GREEN}{tok["stem"]}{Fore.LIGHTBLUE_EX} {tok["suffix"]}{Style.RESET_ALL}\t{tok["type"]}\t{tok["tokens"]}')
 
 def example():
     lexicon = json.load(open("../amis-moedict/docs/s/'a'adingalen.json"))

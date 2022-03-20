@@ -151,11 +151,5 @@ def evaluate(fm, to):
             assert 0, 'word == stem'
         print(f'{v[1]}\t{k:30}{Fore.YELLOW}{tok["prefix"]} {Fore.RED}{tok["dup"]} {Fore.GREEN}{tok["stem"]}{Fore.LIGHTBLUE_EX} {tok["suffix"]}{Style.RESET_ALL}\t{tok["type"]}\t{tok["tokens"]}')
 
-def example():
-    lexicon = json.load(open("../amis-moedict/docs/s/'a'adingalen.json"))
-    ex = lexicon['h'][0]['d'][0]['e'][0].split(u'\ufff9')[1].split(u'\ufffa')[0].replace('`', '').replace('~', '')
-    for w in ex.split():
-        print(w, longest_stem_match(w), sep='\t')
-
 if __name__ == '__main__':
-    example()
+    pass

@@ -7,6 +7,7 @@
 
 import pickle
 import json
+from colorama import Fore, Style
 
 COMMON_PREFIXES = {
         'mapapipa': 'mapa-pipa',
@@ -54,6 +55,9 @@ def tokenize(word):
     """假設 word 是字典中已知的詞
     """
     import re
+    if word not in stem_tags:
+        print('不在字典中的詞:', word)
+        return None
     stem = stem_tags[word][0]
     frame = {'word': word, 'stem': '', 'prefix': '', 'suffix': '', 'type': None, 'tokens': word, 'dup': ''}
     if stem is None:
@@ -139,9 +143,20 @@ def parse_moedict(lexicon):
 def reparse_all_moedict():
     from glob import glob
     fnx = glob('../amis-moedict/docs/s/*.json')
+    for fn in fnx:
+        with open(fn) as f:
+            word = json.load(f)
+            if 't' in word:
+                k = word['t']
+                v = stem_tags.get(k, (None, None))
+                if v[0] is None:
+                    continue
+                tok = tokenize(k)
+                if tok['type'] is None:
+                    continue
+                print(f'{v[1]}\t{k:30}{Fore.YELLOW}{tok["prefix"]} {Fore.RED}{tok["dup"]} {Fore.GREEN}{tok["stem"]}{Fore.LIGHTBLUE_EX} {tok["suffix"]}{Style.RESET_ALL}\t{tok["type"]}\t{tok["tokens"]}')
 
 def evaluate(fm, to):
-    from colorama import Fore, Style
     for k in list(stem_tags.keys())[fm:to]:
         v = stem_tags[k]
         if v[0] is None:
